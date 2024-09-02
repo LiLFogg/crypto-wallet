@@ -1,10 +1,17 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia';
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
-import { useFinanceStore } from './stores/financeStore';
-import { useTransactionStore } from './stores/transactionStore';
-import { useUserStore } from './stores/userStore';
+import { financeStore } from './stores/financeStore'
+import { transactionStore } from './stores/transactionStore'
+import { userStore } from './stores/userStore'
+
+const app = createApp(App)
 const pinia = createPinia()
 
-createApp(App).use(pinia).use(useUserStore).use(useFinanceStore).use(useTransactionStore).use(router).mount('#app')
+app.use(pinia)
+app.use(router)
+
+app.mount('#app')
+
+export { financeStore, transactionStore, userStore }
