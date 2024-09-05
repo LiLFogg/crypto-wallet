@@ -19,7 +19,6 @@ export const useFinanceStore = defineStore('finance', () => {
     }
   }
 
-  // Fetch crypto prices 
   async function fetchCryptoPrices() {
     try {
       const response = await axios.get('https://criptoya.com/api/satoshitango/btc/ars/');
@@ -29,31 +28,29 @@ export const useFinanceStore = defineStore('finance', () => {
     }
   }
 
-  // Calculate total value
   function calculateCryptoBalances() {
-    const balances = {};
+    const balances = {
+      bitcoin: { amount: 100, totalMoney: 10000 },
+      ethereum: { amount: 50, totalMoney: 5000 },
+      // Add more cryptocurrencies as needed
+    };
+
     transactions.value.forEach(transaction => {
       const { crypto_code, crypto_amount, money, action } = transaction;
       if (action === 'purchase') {
-        if (!balances[crypto_code]) {
-          balances[crypto_code] = { amount: 0, totalMoney: 0 };
-        }
         balances[crypto_code].amount += parseFloat(crypto_amount);
         balances[crypto_code].totalMoney += parseFloat(money);
       } else if (action === 'sale') {
-        if (balances[crypto_code]) {
-          balances[crypto_code].amount -= parseFloat(crypto_amount);
-          balances[crypto_code].totalMoney -= parseFloat(money);
-        }
+        balances[crypto_code].amount -= parseFloat(crypto_amount);
+        balances[crypto_code].totalMoney -= parseFloat(money);
       }
     });
-    return balances;
+
+    return Object.values(balances);
   }
 
-  // get the total value of all cryptocurrencies
   const cryptoBalances = computed(() => calculateCryptoBalances());
 
-  // get the total money
   const totalMoney = computed(() => {
     return transactions.value.reduce((acc, transaction) => {
       return transaction.action === 'purchase' ? acc + parseFloat(transaction.money) : acc - parseFloat(transaction.money);

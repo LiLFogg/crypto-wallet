@@ -6,7 +6,7 @@
       <input
         type="text"
         id="userId"
-        v-model="localUserId"
+        v-model="UserId"
         placeholder="Enter alphanumeric ID"
         required
       />
@@ -35,6 +35,7 @@ function handleLogin() {
 <style scoped>
 .login-form {
   max-width: 300px;
+  height: 300px;
   margin: auto;
   padding: 1rem;
   border: 1px solid #ddd;
@@ -51,9 +52,10 @@ label {
 }
 
 input {
-  width: 100%;
+  width: 80%;
   padding: 0.5rem;
-  margin-bottom: 1rem;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -61,11 +63,12 @@ input {
 button {
   width: 100%;
   padding: 0.5rem;
-  background-color: #007bff;
+  background-color: #ff8800;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  
 }
 
 button:hover {

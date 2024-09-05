@@ -8,22 +8,22 @@
     </div>
     <div class="total-money">
       <h3>Total Money:</h3>
-      <p>$ {{ totalMoney.toFixed(2) }}</p>
+      <p>$ {{ totalMoney }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { computed } from 'vue';
 import { useFinanceStore } from '@/stores/financeStore';
-import { useUserStore } from '@/stores/userStore';
+
 
 const financeStore = useFinanceStore();
-const userStore = useUserStore();
 
-onMounted(async () => {
-  await financeStore.fetchTransactions(userStore.userId);
-  await financeStore.fetchCryptoPrices();
+const totalMoney = computed(() => {
+  return financeStore.cryptoBalances.reduce((total, balance) => {
+    return total + balance.amount;
+  }, 0);
 });
 
 
