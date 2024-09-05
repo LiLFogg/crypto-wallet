@@ -30,4 +30,14 @@ function handleResetForm() {
   display: flex;
   flex-direction: column;
 }
+
+.button{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
 </style>

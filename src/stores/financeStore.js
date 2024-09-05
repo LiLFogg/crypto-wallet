@@ -9,8 +9,8 @@ export const useFinanceStore = defineStore('finance', () => {
   //fetch transactions
   async function fetchTransactions(userId) {
     try {
-      const response = await axios.get(`https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id": "${userId}"}`, {
-        headers: { 'x-apikey': 'YOUR_API_KEY' } // replace with your actual API key
+      const response = await axios.get(`https://laboratorio-ab82.restdb.io/rest/transactions?q={"user_id": "${userId}"}`, {
+        headers: { 'x-apikey': '650b525568885487530c00bb' } // replace with your actual API key
       });
       transactions.value = response.data;
       calculateCryptoBalances();

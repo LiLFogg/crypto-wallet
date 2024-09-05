@@ -19,7 +19,6 @@
           type="number"
           id="cryptoAmount"
           v-model.number="cryptoAmount"
-          step="0.00000001"
           min="0"
           required
         />
@@ -114,10 +113,10 @@ function handleSubmit() {
     datetime: formattedDatetime
   };
 
-  axios.post('https://laboratorio3-f36a.restdb.io/rest/transactions', transaction, {
+  axios.post('https://laboratorio-ab82.restdb.io/rest/transactions', transaction, {
     headers: {
       'Content-Type': 'application/json',
-      'x-apikey': 'YOUR_API_KEY' // replace with your actual API key
+      'x-apikey': '650b525568885487530c00bb' 
     }
   })
   .then( () => {
@@ -156,6 +155,7 @@ function showSuccessMessage() {
 <style scoped>
 .transaction-form {
   max-width: 500px;
+  margin-top: 10px;
   margin: auto;
   padding: 1rem;
   border: 1px solid #ddd;
