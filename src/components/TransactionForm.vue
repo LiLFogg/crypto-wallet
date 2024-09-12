@@ -1,30 +1,32 @@
 <template>
   <div class="transaction-form">
+    <button type="button" class="cancel" @click="handleCancel">X</button>
     <h1>New Purchase or Sale</h1>
     <form @submit.prevent="handleSubmit">
-      <div class="form-group">
+      <div class="form-item">
         <label for="cryptoCode">Cryptocurrency:</label>
         <select id="cryptoCode" v-model="cryptoCode" required>
           <option value="" disabled>Select a cryptocurrency</option>
           <option value="bitcoin">Bitcoin</option>
           <option value="usdc">USDC</option>
           <option value="ethereum">Ethereum</option>
-          <!-- Add more cryptocurrencies as needed -->
         </select>
       </div>
-      
-      <div class="form-group">
+
+      <div class="form-item">
         <label for="cryptoAmount">Amount:</label>
         <input
           type="number"
           id="cryptoAmount"
           v-model.number="cryptoAmount"
           min="0"
+          step="0.01"
+          @input="updateArsAmount"
           required
         />
       </div>
-      
-      <div class="form-group">
+
+      <div class="form-item">
         <label for="datetime">Date and Time:</label>
         <input
           type="datetime-local"
@@ -33,20 +35,12 @@
           required
         />
       </div>
-      
-      <div class="form-group">
-        <label for="money">Amount in ARS:</label>
-        <input
-          type="number"
-          id="money"
-          v-model.number="money"
-          step="0.01"
-          min="0"
-          required
-        />
+
+      <div class="form-item">
+        <label for="money">Amount in ARS: {{ arsAmount.toFixed(2) }}</label>
       </div>
-      
-      <div class="form-group">
+
+      <div class="form-item">
         <label for="action">Action:</label>
         <select id="action" v-model="action" required>
           <option value="purchase">Purchase</option>
@@ -60,31 +54,30 @@
 </template>
 
 <script setup>
-/* eslint-disable no-unused-vars */
-import { ref, defineEmits, defineProps } from 'vue';
+import { ref, watch, defineEmits, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useTransactionStore } from '@/stores/transactionStore';
+import { useFinanceStore } from '@/stores/financeStore';
 import axios from 'axios';
 
 const userStore = useUserStore();
 const transactionStore = useTransactionStore();
+const financeStore = useFinanceStore();
 
 const cryptoCode = ref('');
 const cryptoAmount = ref(0);
+const arsAmount = ref(0);
 const datetime = ref('');
-const money = ref(0);
 const action = ref('purchase');
 
-const props = defineProps({
-  transactionForm: {
-    type: Boolean,
-    required: true,
-  }
-})
+const emit = defineEmits(['reset-form']);
 
-const emit = defineEmits(['reset-form'])
+const updateArsAmount = () => {
+  const rate = financeStore.cryptoPrices[cryptoCode.value] || 0;
+  arsAmount.value = cryptoAmount.value * rate;
+};
 
-function handleSubmit() {
+const handleSubmit = () => {
   const id = userStore.userId;
   const formattedDatetime = new Date(datetime.value).toLocaleString('es-AR', {
     timeZone: 'America/Argentina/Buenos_Aires',
@@ -95,12 +88,8 @@ function handleSubmit() {
     minute: '2-digit',
   }).replace(',', '');
 
-  if (
-    cryptoAmount.value <= 0 ||
-    money.value <= 0 ||
-    new Date(datetime.value) > new Date()
-  ) {
-    alert('Invalid input. Ensure amounts are positive and date is not in the future.');
+  if (cryptoAmount.value <= 0 || arsAmount.value <= 0 || new Date(datetime.value) > new Date()) {
+    alert('Invalid Amount.');
     return;
   }
 
@@ -109,17 +98,17 @@ function handleSubmit() {
     action: action.value,
     crypto_code: cryptoCode.value.toLowerCase(),
     crypto_amount: cryptoAmount.value.toFixed(8),
-    money: money.value.toFixed(2),
-    datetime: formattedDatetime
+    money: arsAmount.value.toFixed(2),
+    datetime: formattedDatetime,
   };
 
   axios.post('https://laboratorio-ab82.restdb.io/rest/transactions', transaction, {
     headers: {
       'Content-Type': 'application/json',
-      'x-apikey': '650b525568885487530c00bb' 
-    }
+      'x-apikey': '650b525568885487530c00bb',
+    },
   })
-  .then( () => {
+  .then(() => {
     transactionStore.addTransaction(transaction);
     resetForm();
     showSuccessMessage();
@@ -129,27 +118,38 @@ function handleSubmit() {
     console.error('Error adding transaction:', error);
     alert('There was an error adding the transaction.');
   });
-}
+};
 
-function resetForm() {
+const handleCancel = () => {
+  resetForm();
+  emit('reset-form');
+};
+
+const resetForm = () => {
   cryptoCode.value = '';
   cryptoAmount.value = 0;
   datetime.value = '';
-  money.value = 0;
+  arsAmount.value = 0;
   action.value = 'purchase';
+};
 
-}
-
-function showSuccessMessage() {
+const showSuccessMessage = () => {
   const message = document.createElement('div');
   message.classList.add('success-message');
   message.textContent = 'Transaction added successfully!';
   document.body.appendChild(message);
-
   setTimeout(() => {
     message.remove();
   }, 3000);
-}
+};
+
+watch(cryptoCode, updateArsAmount);
+watch(cryptoAmount, updateArsAmount);
+
+onMounted(async () => {
+  await financeStore.fetchCryptoPrices();
+  await financeStore.fetchTransactions('');
+});
 </script>
 
 <style scoped>
@@ -177,6 +177,19 @@ function showSuccessMessage() {
 
 .form-group {
   margin-bottom: 1rem;
+}
+
+.cancel{
+  cursor:pointer;
+  background-color: transparent;
+  width: 15px;
+  margin-left:30rem;
+  color: darkgray;
+  
+}
+.cancel:hover{
+  color: red;
+  background-color: transparent;
 }
 
 h1 {

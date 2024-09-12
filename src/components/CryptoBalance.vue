@@ -1,14 +1,12 @@
 <template>
   <div class="crypto-balance">
     <h2>Current Balance</h2>
-    <div v-for="(crypto, code) in cryptoBalances" :key="code" class="crypto-item">
-      <h3>Cryptocurrency: {{ code.charAt(0).toUpperCase() + code.slice(1) }}</h3>
-      <p>Quantity: {{ crypto.amount.toFixed(8) }}</p>
-      <p>Value: $ {{ (crypto.totalMoney.toFixed(2)) }}</p>
+    <div v-for="balance in cryptoBalances" :key="balance.crypto_code" class="crypto-item">
+      <p>{{ balance.crypto_code }}: {{ balance.totalMoney.toFixed(2) }} ARS</p>
     </div>
     <div class="total-money">
       <h3>Total Money:</h3>
-      <p>$ {{ totalMoney }}</p>
+      <p>$ {{ totalMoney.toFixed(2) }}</p>
     </div>
   </div>
 </template>
@@ -19,13 +17,9 @@ import { useFinanceStore } from '@/stores/financeStore';
 
 
 const financeStore = useFinanceStore();
+const cryptoBalances = computed(() => financeStore.cryptoBalances);
 
-const totalMoney = computed(() => {
-  return financeStore.cryptoBalances.reduce((total, balance) => {
-    return total + balance.amount;
-  }, 0);
-});
-
+const totalMoney = computed(() => financeStore.totalMoney);
 
 </script>
 

@@ -1,15 +1,8 @@
 <template>
-  <div class="login-form">
-    <h1>Login</h1>
+  <div>
+    <h2>Login</h2>
     <form @submit.prevent="handleLogin">
-      <label for="userId">Enter your ID:</label>
-      <input
-        type="text"
-        id="userId"
-        v-model="UserId"
-        placeholder="Enter alphanumeric ID"
-        required
-      />
+      <input v-model="username" type="text" placeholder="Username" required />
       <button type="submit">Login</button>
     </form>
   </div>
@@ -20,26 +13,34 @@ import { ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
 
+const username = ref('');
 const userStore = useUserStore();
-const UserId = ref('');
 const router = useRouter();
 
-function handleLogin() {
-  if (UserId.value) {
-    userStore.setUserId(UserId.value);
-    router.push('/wallet');
+const handleLogin = async () => {
+  try {
+    await userStore.login(username.value);
+    router.push('/wallet'); 
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Error:', error);
   }
-}
+};
 </script>
 
 <style scoped>
 .login-form {
   max-width: 300px;
-  height: 300px;
+  height: 600px;
   margin: auto;
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+
+img{
+  width: 300px;
 }
 
 h1 {
@@ -63,6 +64,7 @@ input {
 button {
   width: 100%;
   padding: 0.5rem;
+  margin-bottom: 1rem;
   background-color: #ff8800;
   color: white;
   border: none;
