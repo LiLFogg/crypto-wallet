@@ -19,7 +19,11 @@ import { useFinanceStore } from '@/stores/financeStore';
 const financeStore = useFinanceStore();
 const cryptoBalances = computed(() => financeStore.cryptoBalances);
 
-const totalMoney = computed(() => financeStore.totalMoney);
+const totalMoney = computed(() => {
+  return cryptoBalances.value.reduce((acc, balance) => {
+    return acc + Math.max(0, balance.totalMoney);
+  }, 0);
+});
 
 </script>
 

@@ -1,9 +1,10 @@
-// stores/financeStore.js
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useTransactionStore } from './transactionStore';
 import axios from 'axios';
 
 export const useFinanceStore = defineStore('finance', () => {
+  const transactionStore = useTransactionStore();
   const transactions = ref([]);
   const cryptoPrices = ref({
     bitcoin: 0,
@@ -11,13 +12,15 @@ export const useFinanceStore = defineStore('finance', () => {
     ethereum: 0,
   });
 
-  // Fetch transactions
+  
   async function fetchTransactions(userId) {
+    console.log('Fetching transactions for user ID:', userId);
     try {
       const response = await axios.get(`https://laboratorio-ab82.restdb.io/rest/transactions?q={"user_id": "${userId}"}`, {
         headers: { 'x-apikey': '650b525568885487530c00bb' }
       });
       transactions.value = response.data;
+      transactionStore.transactions = response.data;
       calculateCryptoBalances();
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -50,6 +53,7 @@ export const useFinanceStore = defineStore('finance', () => {
     transactions.value.forEach(transaction => {
       const { crypto_code, crypto_amount, money, action } = transaction;
       //inicializo el balance si no existe
+
       if (!balances[crypto_code]) {
         balances[crypto_code] = { amount: 0, totalMoney: 0 };
       }

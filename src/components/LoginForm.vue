@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="login-form">
+    <img src="../assets/images/forniLogo.png" alt="app-logo">
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
       <input v-model="username" type="text" placeholder="Username" required />
@@ -19,11 +20,11 @@ const router = useRouter();
 
 const handleLogin = async () => {
   try {
-    await userStore.login(username.value);
+    userStore.login(username.value);
     router.push('/wallet'); 
   } catch (error) {
     console.error('Login failed:', error);
-    alert('Error:', error);
+    alert('Login Error:', error);
   }
 };
 </script>
@@ -40,7 +41,7 @@ const handleLogin = async () => {
 
 
 img{
-  width: 300px;
+  width: 250px;
 }
 
 h1 {
